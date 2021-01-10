@@ -1,5 +1,5 @@
 export interface JobDBView {
-  date: string,
+  timestamp: number,
   reactNative: boolean,
   salary?: string,
   timezoneRestriction?: string,
@@ -15,12 +15,15 @@ export interface JobDBView {
 }
 
 export interface JobFormView {
-  date?: string;
+  timestamp?: number;
   reactNative?: boolean;
   backendTechnologies?: string[];
   position?: string;
   companyName?: string;
   url?: string;
+  salary?: string;
+  timezoneRestriction?: string,
+  locationRestriction?: string[],
 }
 
 export enum MessageToContentType {
