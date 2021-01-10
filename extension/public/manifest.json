@@ -1,0 +1,26 @@
+{
+  "name": "ReactRemote",
+  "version": "1.0",
+  "manifest_version": 2,
+  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "optional_permissions": [
+    "<all_urls>"
+  ],
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_title": "ReactRemote"
+  },
+  "icons": {
+    "16": "logo128.png",
+    "48": "logo128.png",
+    "128": "logo128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["./static/js/content.js"],
+      "all_frames": false,
+      "run_at": "document_end"
+    }
+  ]
+}
