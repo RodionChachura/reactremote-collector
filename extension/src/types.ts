@@ -13,3 +13,12 @@ export interface Job {
   },
   url: string,
 }
+
+export enum MessageToContentType {
+  GetJobInfo = "GetJobInfo"
+}
+
+export interface MessageToContent {
+  type: MessageToContentType,
+  payload?: any
+}

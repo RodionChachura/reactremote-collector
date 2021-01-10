@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { getCurrentTabId, getCurrentTabUrl } from "src/chrome/utils";
+import { MessageToContent, MessageToContentType } from "src/types";
 
 const containerStyle = {
   backgroundColor: "#121212",
@@ -6,44 +8,53 @@ const containerStyle = {
 };
 
 type JobState = {
-  date: string,
-  reactNative: boolean,
-  backendTechnologies: string,
-  position: string,
-  companyName: string,
-  url: string
-}
+  date: string;
+  reactNative: boolean;
+  backendTechnologies: string;
+  position: string;
+  companyName: string;
+  url: string;
+};
 
 const DEFAULT_JOB_STATE = {
-  date: '',
+  date: "",
   reactNative: false,
-  backendTechnologies: '',
-  position: '',
-  companyName: '',
-  url: ''
-}
+  backendTechnologies: "",
+  position: "",
+  companyName: "",
+  url: "",
+};
 
 const JobForm = () => {
-  const [job, setJob] = useState<JobState>(DEFAULT_JOB_STATE)
+  const [job, setJob] = useState<JobState>(DEFAULT_JOB_STATE);
 
   useEffect(() => {
-    const queryInfo = { active: true, lastFocusedWindow: true };
-
-    chrome.tabs &&
-      chrome.tabs.query(queryInfo, (tabs) => {
-        const url = tabs[0].url || ''
-        setJob(state => ({ ...state, url }))
-      });
+    getCurrentTabUrl((url = "") => {
+      setJob((state) => ({ ...state, url }));
+    });
   }, []);
 
-  console.log(job)
+  useEffect(() => {
+    const message: MessageToContent = {
+      type: MessageToContentType.GetJobInfo,
+    };
+
+    getCurrentTabId((id = 0) => {
+      console.log('Tab id: ', id)
+      chrome.tabs.sendMessage(id, message, (response) => {
+        console.log('Response: ', response);
+      });
+    });
+  });
+
+  console.log(job);
 
   return (
     <div
       style={containerStyle}
       className="container flex flex-col space-y-10 p-2"
     >
-      
+      Job Form Will Be Here
     </div>
   );
 };

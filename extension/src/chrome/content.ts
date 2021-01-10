@@ -1,3 +1,9 @@
-console.log('Content!!!')
+import { MessageToContent, MessageToContentType } from "src/types"
 
-export {}
+type MessageResponse = (response?: any) => void
+
+chrome.runtime.onMessage.addListener((message: MessageToContent, sender: any, sendResponse: MessageResponse) => {
+  if (message.type === MessageToContentType.GetJobInfo) {
+    sendResponse({ position: 'Full Stack', backendTechnologies: ['Python', 'Django']})
+  }
+})
