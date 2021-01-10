@@ -1,4 +1,4 @@
-export interface Job {
+export interface JobDBView {
   date: string,
   reactNative: boolean,
   salary?: string,
@@ -12,6 +12,15 @@ export interface Job {
     name: string,
   },
   url: string,
+}
+
+export interface JobFormView {
+  date?: string;
+  reactNative?: boolean;
+  backendTechnologies?: string[];
+  position?: string;
+  companyName?: string;
+  url?: string;
 }
 
 export enum MessageToContentType {

@@ -1,32 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { getCurrentTabId, getCurrentTabUrl } from "src/chrome/utils";
-import { MessageToContent, MessageToContentType } from "src/types";
+import { JobFormView, MessageToContent, MessageToContentType } from "src/types";
 
 const containerStyle = {
   backgroundColor: "#121212",
   minWidth: 400,
 };
 
-type JobState = {
-  date: string;
-  reactNative: boolean;
-  backendTechnologies: string;
-  position: string;
-  companyName: string;
-  url: string;
-};
-
-const DEFAULT_JOB_STATE = {
-  date: "",
-  reactNative: false,
-  backendTechnologies: "",
-  position: "",
-  companyName: "",
-  url: "",
-};
-
 const JobForm = () => {
-  const [job, setJob] = useState<JobState>(DEFAULT_JOB_STATE);
+  const [job, setJob] = useState<JobFormView>({});
 
   useEffect(() => {
     getCurrentTabUrl((url = "") => {
@@ -41,8 +23,8 @@ const JobForm = () => {
 
     getCurrentTabId((id = 0) => {
       console.log('Tab id: ', id)
-      chrome.tabs.sendMessage(id, message, (response) => {
-        console.log('Response: ', response);
+      chrome.tabs.sendMessage(id, message, (response: JobFormView) => {
+        setJob(state => ({ ...state, ...response}))
       });
     });
   });
