@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { getCurrentTabId, getCurrentTabUrl } from "src/chrome/utils";
 import { JobFormView, MessageToContent, MessageToContentType } from "src/types";
 import Input from "./input";
+import { convertToDbView } from "./utils";
 
 const containerStyle = {
   backgroundColor: "#121212",
@@ -43,7 +44,8 @@ const JobForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('Submit: ', job)
+    const dbView = convertToDbView(job)
+    console.log('Submit: ', dbView)
   }
 
   return (

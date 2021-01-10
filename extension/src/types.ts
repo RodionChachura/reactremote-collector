@@ -1,4 +1,5 @@
 export interface JobDBView {
+  id: string,
   timestamp: number,
   reactNative: boolean,
   salary?: string,
@@ -8,7 +9,7 @@ export interface JobDBView {
     technologies: string[],
   },
   position: string,
-  company: {
+  company?: {
     name: string,
   },
   url: string,
