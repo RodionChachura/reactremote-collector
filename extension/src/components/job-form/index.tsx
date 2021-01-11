@@ -4,6 +4,7 @@ import { getCurrentTabId, getCurrentTabUrl } from "src/chrome/utils";
 import { JobFormView, MessageToContent, MessageToContentType } from "src/types";
 import Input from "./input";
 import { convertToDbView } from "./utils";
+import { putJob } from 'src/db'
 
 const containerStyle = {
   backgroundColor: "#121212",
@@ -46,6 +47,7 @@ const JobForm = () => {
     e.preventDefault()
     const dbView = convertToDbView(job)
     console.log('Submit: ', dbView)
+    putJob(dbView)
   }
 
   return (
@@ -99,10 +101,10 @@ const JobForm = () => {
         <input
           type="checkbox"
           className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-          onChange={({ target }) =>
-            updateJob({ reactNative: Boolean(target.value) })
+          onChange={() => 
+            updateJob({ reactNative: !job.reactNative })
           }
-          value={job.reactNative?.toString()}
+          checked={job.reactNative}
         />
       </div>
       <button type="submit" className="p-2 text-gray-800 shadow-sm rounded-md bg-indigo-200 hover:bg-indigo-300">

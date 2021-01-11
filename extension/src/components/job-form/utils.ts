@@ -1,8 +1,8 @@
 import { JobDBView, JobFormView } from "src/types";
+import { dynamoUtils } from 'src/db'
 
 export const convertToDbView = (job: JobFormView): JobDBView => {
   const view: Partial<JobDBView> = {
-    id: 'uuid...',
     timestamp: job.timestamp || Math.round(Date.now() / 1000),
     reactNative: job.reactNative || false,
     salary: job.salary,
@@ -26,5 +26,5 @@ export const convertToDbView = (job: JobFormView): JobDBView => {
     Object.entries(view).filter(([, value]) => value)
   );
 
-  return viewWithoutUndefined as JobDBView;
+  return dynamoUtils.withId(viewWithoutUndefined) as JobDBView;
 };
