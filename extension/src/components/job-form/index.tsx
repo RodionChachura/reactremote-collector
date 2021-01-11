@@ -15,8 +15,21 @@ const JOB_DEFAULT_STATE: JobFormView = {
   timestamp: Math.round(Date.now() / 1000),
 };
 
+enum SubmitStatus {
+  Success = 'Success',
+  Failure = 'Failure'
+}
+
 const JobForm = () => {
   const [job, setJob] = useState<JobFormView>(JOB_DEFAULT_STATE);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null)
+  const [submittedJobId, setSubmittedJobId] = useState<string | undefined>()
+
+  useEffect(() => {
+    if(job.url) {
+      chrome.storage.local.get(job.url, result => updateJob(result[job.url as string]))
+    }
+  }, [job.url])
 
   const updateJob = (part: Partial<JobFormView>) => {
     setJob((state) => ({
@@ -24,6 +37,16 @@ const JobForm = () => {
       ...part,
     }));
   };
+
+  useEffect(() => {
+    chrome.storage.local.set({ [job.url || '']: job })
+  }, [job])
+
+  useEffect(() => {
+    if (submittedJobId) {
+      chrome.storage.local.remove(submittedJobId)
+    }
+  }, [submittedJobId])
 
   useEffect(() => {
     getCurrentTabUrl((url = "") => {
@@ -43,11 +66,18 @@ const JobForm = () => {
     });
   }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const dbView = convertToDbView(job)
     console.log('Submit: ', dbView)
-    putJob(dbView)
+    try {
+      await putJob(dbView)
+      setSubmitStatus(SubmitStatus.Success)
+      setSubmittedJobId(dbView.id)
+    } catch (err) {
+      console.log('Fail to put a job: ', err)
+      setSubmitStatus(SubmitStatus.Failure)
+    }
   }
 
   return (
@@ -82,14 +112,14 @@ const JobForm = () => {
         onChange={(str) => updateJob({ timezoneRestriction: str })}
       />
       <Input
-        label="Backend Technologies"
-        value={job.backendTechnologies?.join(',')}
-        onChange={(str) => updateJob({ backendTechnologies: str.split(',') })}
-      />
-      <Input
         label="Location Restriction"
         value={job.locationRestriction?.join(',')}
         onChange={(str) => updateJob({ locationRestriction: str.split(',') })}
+      />
+      <Input
+        label="Backend Technologies"
+        value={job.backendTechnologies?.join(',')}
+        onChange={(str) => updateJob({ backendTechnologies: str.split(',') })}
       />
       <Input
         label="Url"
@@ -100,7 +130,7 @@ const JobForm = () => {
         <label className="text-sm text-gray-100">React Native</label>
         <input
           type="checkbox"
-          className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+          className="h-4 w-4 text-indigo-200 border-gray-300 rounded"
           onChange={() => 
             updateJob({ reactNative: !job.reactNative })
           }
@@ -110,6 +140,11 @@ const JobForm = () => {
       <button type="submit" className="p-2 text-gray-800 shadow-sm rounded-md bg-indigo-200 hover:bg-indigo-300">
         Submit
       </button>
+      {submitStatus && (submitStatus === SubmitStatus.Success ? (
+        <p className="text-green-200">Success: {submittedJobId}</p>
+      ) : (
+        <p className="text-red-200">Fail</p>
+      ))}
     </form>
   );
 };
