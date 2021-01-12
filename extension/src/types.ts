@@ -2,17 +2,13 @@ export interface JobDBView {
   id: string,
   timestamp: number,
   reactNative: boolean,
+  position: string,
+  url: string,
   salary?: string,
   timezoneRestriction?: string,
   locationRestriction?: string[],
-  backend?: {
-    technologies: string[],
-  },
-  position: string,
-  company?: {
-    name: string,
-  },
-  url: string,
+  backendTechnologies?: string[],
+  companyName?: string,
 }
 
 export interface JobFormView {
