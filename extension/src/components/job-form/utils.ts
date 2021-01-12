@@ -10,7 +10,7 @@ export const convertToDbView = (job: JobFormView): JobDBView => {
     locationRestriction: job.locationRestriction,
     backendTechnologies: job.backendTechnologies,
     position: job.position,
-    company: job.companyName,
+    companyName: job.companyName,
     url: job.url,
   };
 

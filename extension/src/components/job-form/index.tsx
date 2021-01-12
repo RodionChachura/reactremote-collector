@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { DateTime } from 'luxon'
 
 import { getCurrentTabId, getCurrentTabUrl } from "src/chrome/utils";
 import { JobFormView, MessageToContent, MessageToContentType } from "src/types";
@@ -96,11 +97,16 @@ const JobForm = () => {
         value={job.companyName}
         onChange={(str) => updateJob({ companyName: str })}
       />
-      <Input
-        label={'Timestamp'}
-        value={job.timestamp}
-        onChange={(str) => updateJob({ timestamp: Number(str) })}
-      />
+      <div className="flex space-x-2">
+        <Input
+          label={'Timestamp'}
+          value={job.timestamp}
+          onChange={(str) => updateJob({ timestamp: Number(str) })}
+        />
+        <button type="button" onClick={() => updateJob({ timestamp: Math.round(DateTime.local().minus({ days: 1 }).toSeconds()) })} className="p-2 text-gray-800 shadow-sm rounded-md bg-yellow-200">
+          Yesterday
+        </button>
+      </div>
       <Input
         label="Salary"
         value={job.salary}
