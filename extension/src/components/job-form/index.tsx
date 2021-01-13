@@ -5,7 +5,7 @@ import { getCurrentTabId, getCurrentTabUrl } from "src/chrome/utils";
 import { JobFormView, MessageToContent, MessageToContentType } from "src/types";
 import Input from "./input";
 import { convertToDbView } from "./utils";
-import { putJob } from 'src/db'
+import { putJob, isJobExists } from 'src/db'
 
 const containerStyle = {
   backgroundColor: "#121212",
@@ -23,6 +23,7 @@ enum SubmitStatus {
 
 const JobForm = () => {
   const [job, setJob] = useState<JobFormView>(JOB_DEFAULT_STATE);
+  const [isJobExistsInDb, setIsJobExistsInDb] = useState<boolean>(false)
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null)
   const [submittedJobId, setSubmittedJobId] = useState<string | undefined>()
 
@@ -31,6 +32,18 @@ const JobForm = () => {
       chrome.storage.local.get(job.url, result => updateJob(result[job.url as string]))
     }
   }, [job.url])
+
+  useEffect(() => {
+    const checkIfExists = async () => {
+      if (job.position && job.companyName) {
+        const exists = await isJobExists(job.position, job.companyName)
+        if (exists) {
+          setIsJobExistsInDb(true)
+        }
+      }
+    }
+    checkIfExists()
+  }, [job.position, job.companyName])
 
   const updateJob = (part: Partial<JobFormView>) => {
     setJob((state) => ({
@@ -151,6 +164,9 @@ const JobForm = () => {
       ) : (
         <p className="text-red-200">Fail</p>
       ))}
+      {isJobExistsInDb && (
+        <p className="text-green-200">In the DB</p>
+      )}
     </form>
   );
 };

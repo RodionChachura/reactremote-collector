@@ -20,3 +20,21 @@ const JOBS_TABLE_NAME = 'reactremote_jobs'
 // })
 
 export const putJob = (job: JobDBView) => dynamoUtils.put(JOBS_TABLE_NAME, job)
+
+export const isJobExists = async (position: string, companyName: string) => {
+  const scan = dynamoUtils.paginationAware('scan')
+  const jobs = await scan({
+    TableName: JOBS_TABLE_NAME,
+    FilterExpression: '#position = :position and #companyName = :companyName',
+    ExpressionAttributeValues: {
+      ':position': position,
+      ':companyName': companyName
+    },
+    ExpressionAttributeNames: {
+      '#position': 'position',
+      '#companyName': 'companyName'
+    }
+  })
+
+  return jobs.length > 0
+}
