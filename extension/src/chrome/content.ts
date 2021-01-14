@@ -2,7 +2,6 @@ import { MessageToContent, MessageToContentType, JobFormView } from "src/types"
 
 type MessageResponse = (response?: any) => void
 
-
 const scrape = (domain: string) => {
   let job: Partial<JobFormView> = {}
   if (domain.includes('angel.co')) {
@@ -43,28 +42,34 @@ const scrape = (domain: string) => {
     if (h2) {
       job.companyName = h2.innerText
     }
+  } else if (domain.includes('remoteok.io')) {
+    job.companyName = (document.getElementsByClassName('companyLink')[0] as HTMLElement).innerText
+    job.position = document.getElementsByTagName('h2')[2].innerText
   }
 
   return job
+}
+
+const doesTextContain = (text: string, regex: any) => {
+  const match = text.match(regex)
+  return Boolean(match && match.length > 0)
 }
 
 chrome.runtime.onMessage.addListener((message: MessageToContent, sender: any, sendResponse: MessageResponse) => {
   if (message.type === MessageToContentType.GetJobInfo) {
     const text = document.documentElement.textContent || document.documentElement.innerText
 
-    const reactNativeMatch = text.match(/react native/i)
-    const reactNative = Boolean(reactNativeMatch && reactNativeMatch.length > 0)
-
-    let response: JobFormView = {
-      reactNative
-    }
-
+    const reactNative = doesTextContain(text, /react native/i)
     const domain = window.location.hostname
-    response = {
-      ...response,
+    let job: JobFormView = {
+      reactNative,
       ...scrape(domain)
     }
-  
-    sendResponse(response)
+    
+    const isReactJob = doesTextContain(text, /react/i)
+    sendResponse({
+      isReactJob,
+      job
+    })
   }
 })

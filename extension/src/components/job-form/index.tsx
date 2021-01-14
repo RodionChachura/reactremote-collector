@@ -26,6 +26,7 @@ const JobForm = () => {
   const [isJobExistsInDb, setIsJobExistsInDb] = useState<boolean>(false)
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null)
   const [submittedJobId, setSubmittedJobId] = useState<string | undefined>()
+  const [isReactJob, setIsReactJob] = useState<Boolean>(false)
 
   useEffect(() => {
     if(job.url) {
@@ -74,8 +75,9 @@ const JobForm = () => {
     };
 
     getCurrentTabId((id = 0) => {
-      chrome.tabs.sendMessage(id, message, (response: JobFormView) => {
-        updateJob(response);
+      chrome.tabs.sendMessage(id, message, ({ job, isReactJob }) => {
+        updateJob(job);
+        setIsReactJob(isReactJob)
       });
     });
   }, []);
@@ -100,6 +102,9 @@ const JobForm = () => {
       style={containerStyle}
       className="container flex flex-col space-y-2 p-2"
     >
+      {!isReactJob && (
+        <p className="text-yellow-200">No React</p>
+      )}
       <Input
         label={'Position'}
         value={job.position}
