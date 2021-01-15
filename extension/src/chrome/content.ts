@@ -45,6 +45,26 @@ const scrape = (domain: string) => {
   } else if (domain.includes('remoteok.io')) {
     job.companyName = (document.getElementsByClassName('companyLink')[0] as HTMLElement).innerText
     job.position = document.getElementsByTagName('h2')[2].innerText
+    const locationHeadline = document.getElementById('location')
+    if (locationHeadline) {
+      const location = (locationHeadline.nextSibling?.nextSibling as HTMLElement).innerText
+      if (!location.includes('Worldwide')) {
+        job.locationRestriction = location.split(', ')
+      }
+    }
+    const salaryHeadline = document.getElementById('salary')
+    if (salaryHeadline) {
+      job.salary = (salaryHeadline.nextSibling?.nextSibling as HTMLElement).innerText
+    }
+  }
+
+  if (job.locationRestriction) {
+    job.locationRestriction = job.locationRestriction.map(location => {
+      if (['United States', 'USA'].includes(location)) {
+        return 'US'
+      }
+      return location
+    })
   }
 
   return job
