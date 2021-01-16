@@ -8,7 +8,7 @@ const doesTextContain = (text: string, regex: any) => {
   return Boolean(match && match.length > 0)
 }
 
-const getBETechnology = (text: string): string[] => {
+const getBETechnologies = (text: string): string[] => {
   return BACK_END_TECH.filter(tech => {
     const isPresent = doesTextContain(text, new RegExp(tech, 'i'))
     return isPresent
@@ -50,7 +50,7 @@ const scrape = (domain: string) => {
     if (bodySibling) {
       const body = (bodySibling as HTMLElement).previousSibling
       if (body) {
-        job.backendTechnologies = getBETechnology((body as HTMLElement).innerText)
+        job.backendTechnologies = getBETechnologies((body as HTMLElement).innerText)
       }
     }
   } else if (domain.includes('weworkremotely.com')) {
@@ -62,6 +62,11 @@ const scrape = (domain: string) => {
     const h2 = document.getElementsByTagName('h2')[1]
     if (h2) {
       job.companyName = h2.innerText
+    }
+
+    const listing = document.getElementsByClassName('listing-container')[0]
+    if (listing) {
+      job.backendTechnologies = getBETechnologies((listing as HTMLElement).innerText)
     }
   } else if (domain.includes('remoteok.io')) {
     job.companyName = (document.getElementsByClassName('companyLink')[0] as HTMLElement).innerText
@@ -86,6 +91,11 @@ const scrape = (domain: string) => {
       }
       return location
     })
+  }
+
+  const markdown = document.getElementsByClassName('markdown')[0]
+  if (markdown) {
+    job.backendTechnologies = getBETechnologies((markdown as HTMLElement).innerText)
   }
 
   return job
