@@ -7,12 +7,16 @@ export const convertToDbView = (job: JobFormView): JobDBView => {
     reactNative: job.reactNative || false,
     salary: job.salary,
     timezoneRestriction: job.timezoneRestriction,
-    locationRestriction: job.locationRestriction,
-    backendTechnologies: job.backendTechnologies,
     position: job.position,
     companyName: job.companyName,
     url: job.url,
   };
+  if (job.backendTechnologies && job.backendTechnologies.length > 0) {
+    view.backendTechnologies = job.backendTechnologies
+  }
+  if (job.locationRestriction && job.locationRestriction.length > 0) {
+    view.locationRestriction = job.locationRestriction
+  }
 
   const viewWithoutUndefined: Partial<JobDBView> = Object.fromEntries(
     Object.entries(view).filter(([, value]) => value)

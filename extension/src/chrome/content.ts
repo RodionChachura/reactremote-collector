@@ -1,6 +1,19 @@
 import { MessageToContent, MessageToContentType, JobFormView } from "src/types"
+import { BACK_END_TECH } from './constants'
 
 type MessageResponse = (response?: any) => void
+
+const doesTextContain = (text: string, regex: any) => {
+  const match = text.match(regex)
+  return Boolean(match && match.length > 0)
+}
+
+const getBETechnology = (text: string): string[] => {
+  return BACK_END_TECH.filter(tech => {
+    const isPresent = doesTextContain(text, new RegExp(tech, 'i'))
+    return isPresent
+  })
+}
 
 const scrape = (domain: string) => {
   let job: Partial<JobFormView> = {}
@@ -30,6 +43,14 @@ const scrape = (domain: string) => {
         if (hiresIn && hiresIn !== 'Everywhere') {
           job.locationRestriction = hiresIn.split(' • ')
         }
+      }
+    }
+    
+    const bodySibling = document.getElementsByClassName('breakpoint__desktop-up ')[0]
+    if (bodySibling) {
+      const body = (bodySibling as HTMLElement).previousSibling
+      if (body) {
+        job.backendTechnologies = getBETechnology((body as HTMLElement).innerText)
       }
     }
   } else if (domain.includes('weworkremotely.com')) {
@@ -68,11 +89,6 @@ const scrape = (domain: string) => {
   }
 
   return job
-}
-
-const doesTextContain = (text: string, regex: any) => {
-  const match = text.match(regex)
-  return Boolean(match && match.length > 0)
 }
 
 chrome.runtime.onMessage.addListener((message: MessageToContent, sender: any, sendResponse: MessageResponse) => {
