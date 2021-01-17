@@ -15,8 +15,16 @@ const getBETechnologies = (text: string): string[] => {
   })
 }
 
-const scrape = (domain: string) => {
+interface ScrapeResult {
+  job: Partial<JobFormView>,
+  isReactJob: boolean
+}
+
+const scrape = (domain: string): ScrapeResult => {
   let job: Partial<JobFormView> = {}
+  let body = ''
+  let isReactJob = false
+
   if (domain.includes('angel.co')) {
     const h1 = document.getElementsByTagName('h1')[0]
     if (h1) {
@@ -48,9 +56,9 @@ const scrape = (domain: string) => {
     
     const bodySibling = document.getElementsByClassName('breakpoint__desktop-up ')[0]
     if (bodySibling) {
-      const body = (bodySibling as HTMLElement).previousSibling
-      if (body) {
-        job.backendTechnologies = getBETechnologies((body as HTMLElement).innerText)
+      const bodyElement = (bodySibling as HTMLElement).previousSibling
+      if (bodyElement) {
+        body = (bodyElement as HTMLElement).innerText
       }
     }
   } else if (domain.includes('weworkremotely.com')) {
@@ -66,7 +74,7 @@ const scrape = (domain: string) => {
 
     const listing = document.getElementsByClassName('listing-container')[0]
     if (listing) {
-      job.backendTechnologies = getBETechnologies((listing as HTMLElement).innerText)
+      body = (listing as HTMLElement).innerText
     }
   } else if (domain.includes('remoteok.io')) {
     job.companyName = (document.getElementsByClassName('companyLink')[0] as HTMLElement).innerText
@@ -82,6 +90,11 @@ const scrape = (domain: string) => {
     if (salaryHeadline) {
       job.salary = (salaryHeadline.nextSibling?.nextSibling as HTMLElement).innerText
     }
+
+    const markdown = document.getElementsByClassName('markdown')[0]
+    if (markdown) {
+      body = (markdown as HTMLElement).innerText
+    }
   }
 
   if (job.locationRestriction) {
@@ -92,30 +105,22 @@ const scrape = (domain: string) => {
       return location
     })
   }
-
-  const markdown = document.getElementsByClassName('markdown')[0]
-  if (markdown) {
-    job.backendTechnologies = getBETechnologies((markdown as HTMLElement).innerText)
+  if (body) {
+    job.reactNative = doesTextContain(body, /react native/i)
+    job.backendTechnologies = getBETechnologies(body)
+    isReactJob = doesTextContain(body, /react/i)
   }
 
-  return job
+  return {
+    job,
+    isReactJob
+  }
 }
 
 chrome.runtime.onMessage.addListener((message: MessageToContent, sender: any, sendResponse: MessageResponse) => {
   if (message.type === MessageToContentType.GetJobInfo) {
-    const text = document.documentElement.textContent || document.documentElement.innerText
-
-    const reactNative = doesTextContain(text, /react native/i)
     const domain = window.location.hostname
-    let job: JobFormView = {
-      reactNative,
-      ...scrape(domain)
-    }
     
-    const isReactJob = doesTextContain(text, /react/i)
-    sendResponse({
-      isReactJob,
-      job
-    })
+    sendResponse(scrape(domain))
   }
 })
