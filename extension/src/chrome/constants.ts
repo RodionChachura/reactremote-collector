@@ -6,5 +6,8 @@ export const BACK_END_TECH = [
   'PHP',
   'Laravel',
   'Elixir',
-  'AWS'
+  'AWS',
+  'Java',
+  'Spring',
+  'C#'
 ]
