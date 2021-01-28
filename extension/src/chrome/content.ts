@@ -10,7 +10,7 @@ const doesTextContain = (text: string, regex: any) => {
 
 const getBETechnologies = (text: string): string[] => {
   return BACK_END_TECH.filter(tech => {
-    const reg = tech === 'Node' ? tech : `${tech}\b`
+    const reg = tech === 'Node' ? tech : `${tech}\\b`
     const isPresent = doesTextContain(text, new RegExp(reg, 'i'))
     return isPresent
   })

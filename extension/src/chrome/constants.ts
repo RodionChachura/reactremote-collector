@@ -9,5 +9,8 @@ export const BACK_END_TECH = [
   'AWS',
   'Java',
   'Spring',
-  'C#'
+  'C#',
+  'Postgres',
+  'Redis',
+  'Go'
 ]
