@@ -21,6 +21,8 @@ enum SubmitStatus {
   Failure = 'Failure'
 }
 
+const stringToArray = (str:string) => str.split(',').filter(s => !['', ' '].includes(s)) 
+
 const JobForm = () => {
   const [job, setJob] = useState<JobFormView>(JOB_DEFAULT_STATE);
   const [isJobExistsInDb, setIsJobExistsInDb] = useState<boolean>(false)
@@ -138,12 +140,12 @@ const JobForm = () => {
       <Input
         label="Location Restriction"
         value={job.locationRestriction?.join(',')}
-        onChange={(str) => updateJob({ locationRestriction: str.split(',') })}
+        onChange={(str) => updateJob({ locationRestriction: stringToArray(str) })}
       />
       <Input
         label="Backend Technologies"
         value={job.backendTechnologies?.join(',')}
-        onChange={(str) => updateJob({ backendTechnologies: str.split(',') })}
+        onChange={(str) => updateJob({ backendTechnologies: stringToArray(str) })}
       />
       <Input
         label="Url"
