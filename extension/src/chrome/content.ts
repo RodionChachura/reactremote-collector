@@ -1,5 +1,5 @@
 import { MessageToContent, MessageToContentType, JobFormView } from "src/types"
-import { BACK_END_TECH } from './constants'
+import { BACK_END_TECH_REGEX } from './constants'
 
 type MessageResponse = (response?: any) => void
 
@@ -9,11 +9,10 @@ const doesTextContain = (text: string, regex: any) => {
 }
 
 const getBETechnologies = (text: string): string[] => {
-  return BACK_END_TECH.filter(tech => {
-    const reg = tech === 'Node' ? tech : `${tech}\\b`
-    const isPresent = doesTextContain(text, new RegExp(reg, 'i'))
+  return Object.entries(BACK_END_TECH_REGEX).filter(([, regex]) => {
+    const isPresent = doesTextContain(text, regex)
     return isPresent
-  })
+  }).map(([tech]) => tech)
 }
 
 interface ScrapeResult {

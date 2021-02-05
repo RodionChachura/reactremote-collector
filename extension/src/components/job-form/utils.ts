@@ -1,6 +1,11 @@
 import { JobDBView, JobFormView } from "src/types";
 import { dynamoUtils } from 'src/db'
 
+const getFilteredArray = (array: string[] | undefined): string[] | undefined => {
+  const filtered = (array || []).filter(s => !['', ' '].includes(s))
+  return filtered.length ? filtered : undefined
+}
+
 export const convertToDbView = (job: JobFormView): JobDBView => {
   const view: Partial<JobDBView> = {
     timestamp: job.timestamp || Math.round(Date.now() / 1000),
@@ -9,14 +14,10 @@ export const convertToDbView = (job: JobFormView): JobDBView => {
     timezoneRestriction: job.timezoneRestriction,
     position: job.position,
     companyName: job.companyName,
+    backendTechnologies: getFilteredArray(job.backendTechnologies),
+    locationRestriction: getFilteredArray(job.locationRestriction),
     url: job.url,
   };
-  if (job.backendTechnologies && job.backendTechnologies.length > 0) {
-    view.backendTechnologies = job.backendTechnologies
-  }
-  if (job.locationRestriction && job.locationRestriction.length > 0) {
-    view.locationRestriction = job.locationRestriction
-  }
 
   const viewWithoutUndefined: Partial<JobDBView> = Object.fromEntries(
     Object.entries(view).filter(([, value]) => value)
