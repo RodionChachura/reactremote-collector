@@ -99,7 +99,7 @@ const scrape = (domain: string): ScrapeResult => {
 
   if (job.locationRestriction) {
     job.locationRestriction = job.locationRestriction.map(location => {
-      if (['United States', 'USA'].includes(location)) {
+      if (doesTextContain(location, /(united states|us)/i)) {
         return 'US'
       }
       return location
