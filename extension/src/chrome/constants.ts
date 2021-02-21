@@ -11,6 +11,7 @@ export const BACK_END_TECH_REGEX = {
   Java: /(java|spring)\b/i,
   'C#': /(c#|\.net)/i,
   Postgres: /postgres/i,
+  MongoDB: /mongo/i,
   Redis: /redis/i,
-  Go: /Go\b/
+  Go: /(Go|Golang)\b/
 }
